@@ -4,7 +4,6 @@ client ==>
     npm i jsonwebtoken bcryptjs express cors mongoose socket.io vite dotenv
     npm i nodemon -D
     
-    Run command == npm run dev
 
 
 server ==>
