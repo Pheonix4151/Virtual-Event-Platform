@@ -1,11 +1,11 @@
 import React from 'react'
-
+import Homepage from './components/Homepage';
 const App = () => {
   return (
-    <div className='text-red-600'>
-      App
+    <div >
+     <Homepage/>
     </div>
   )
 }
 
-export default App
+export default App;
