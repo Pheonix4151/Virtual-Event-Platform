@@ -1,13 +1,13 @@
-client ==>
+server ==>
 
-    npm init -y
+    //npm init -y
     npm i jsonwebtoken bcryptjs express cors mongoose socket.io vite dotenv
     npm i nodemon -D
     
 
 
-server ==>
+client ==>
 
-    npm create vite@latest .
+    //npm create vite@latest .
     npm install -D tailwindcss@3 postcss autoprefixer
     npx tailwindcss init -p
