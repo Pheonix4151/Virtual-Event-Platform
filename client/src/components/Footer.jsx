@@ -1,3 +1,4 @@
+// Desc: Footer component for the website
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import {
