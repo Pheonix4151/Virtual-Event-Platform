@@ -1,3 +1,5 @@
+//Backed Server
+//This file is the entry point of the server. It is responsible for starting the server and connecting to the database. It also defines the routes for the application. 
 import express from 'express';
 import dotenv from 'dotenv';
 import getAuthUser from './routes/auth.routes.js';
