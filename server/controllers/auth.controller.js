@@ -1,7 +1,8 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
-import User from '../models/auth.model.js';
 import { generateToken } from '../lib/generateToken.js';
+import Customer from '../models/customer.model.js';
+import Host from '../models/host.model.js';
 
 export const signup = async (req, res) => {
     try {
@@ -15,57 +16,108 @@ export const signup = async (req, res) => {
         if (role !== 'host' && role !== 'customer') {
             return res.status(400).send('Invalid role');
         }
-        const user = await User.findOne({ email });
-        if (user) {
-            return res.status(400).send('User already exists');
-        }
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-
-        const newUser = new User({
-            name,
-            email,
-            password: hashedPassword,
-            role,
-            phone
-        });
-        if (!user) {
-            generateToken(newUser._id, res);
-            await newUser.save();
-            res.status(201).send({
-                _id: newUser._id,
-                name: newUser.name,
-                email: newUser.email,
-                role: newUser.role,
-                phone: newUser.phone
+        if (role === 'customer') {
+            const customer = await Customer.findOne({ email });
+            if (customer) {
+                return res.status(400).send('User already exists');
+            }
+            const newUser = new Customer({
+                name,
+                email,
+                password: hashedPassword,
+                role,
+                phone
             });
+            if (!customer) {
+                generateToken(newUser._id, res);
+                await newUser.save();
+                res.status(201).send({
+                    _id: newUser._id,
+                    name: newUser.name,
+                    email: newUser.email,
+                    role: newUser.role,
+                    phone: newUser.phone
+                });
+            }
+        }
+        else {
+            const host = await Host.findOne({ email });
+            if (host) {
+                return res.status(400).send('User already exists');
+            }
+            const newUser = new Host({
+                name,
+                email,
+                password: hashedPassword,
+                role,
+                phone
+            });
+            if (!host) {
+                generateToken(newUser._id, res);
+                await newUser.save();
+                res.status(201).send({
+                    _id: newUser._id,
+                    name: newUser.name,
+                    email: newUser.email,
+                    role: newUser.role,
+                    phone: newUser.phone
+                });
+            }
         }
     } catch (error) {
         res.status(500).send('Something went wrong');
     }
 };
 export const login = async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
     try {
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(400).json({ message: "Invalid Credentials" })
+        if (role !== "customer" && role !== "host") {
+            return res.status(400).json({ message: "Please Enter a valid Role" });
         }
-        
-        const isPasswordCorrect = await bcrypt.compare(password, user.password);
-        
-        if (!isPasswordCorrect) {
-            return res.status(400).json({ message: "Invalid Credentials" })
-        }
+        if (role === "customer") {
+            const user = await Customer.findOne({ email });
+            if (!user) {
+                return res.status(400).json({ message: "Invalid Credentials" })
+            }
 
-        generateToken(user._id,res);
-        res.status(201).json({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            phone: user.phone
-        });
+            const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+            if (!isPasswordCorrect) {
+                return res.status(400).json({ message: "Invalid Credentials" })
+            }
+
+            generateToken(user._id, res);
+            res.status(201).json({
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                phone: user.phone
+            });
+        }
+        else {
+            const user = await Host.findOne({ email });
+            if (!user) {
+                return res.status(400).json({ message: "Invalid Credentials" })
+            }
+
+            const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+            if (!isPasswordCorrect) {
+                return res.status(400).json({ message: "Invalid Credentials" })
+            }
+
+            generateToken(user._id, res);
+            res.status(201).json({
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                phone: user.phone
+            });
+        }
     } catch (error) {
         console.log("Error In Login Controller");
         res.status(500).json({ message: "Internal Server Error" });
